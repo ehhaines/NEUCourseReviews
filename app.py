@@ -1,5 +1,6 @@
 import os
 import db
+import user
 
 logo = '''
    _  ________  __              
@@ -18,10 +19,10 @@ logo = '''
 if __name__ == "__main__":
   
   cnx = db.db_connect()
-  cursor = cnx.cursor
+  cursor = cnx.cursor()
 
   print(logo + "\n\n")
-  print("Welcome to NEU Course Reviews! Based on Northeastern's TRACE Evaluations, NEU Course Reviews is \na course evalution system" +
+  print("Welcome to NEU Course Reviews! Based on Northeastern's TRACE Evaluations, NEU Course Reviews is \na course evalution system " +
   "made with students in mind. If you are new here, you can create an \naccount using the 'create account' command. Otherwise, " +
   "use the 'login' command to redirect to the \nlogin screen.\n")
   print("(You can always use the 'help' command if you are unsure of how to proceed)\n")
@@ -30,10 +31,11 @@ if __name__ == "__main__":
   login = login.lower()
 
   if login == "create account":
-    pass
+    os.system('cls' if os.name == 'nt' else 'clear')
+    user.create_account(cursor)
   elif login == "login":
     pass
   else:
     print("Error: invalid command. Use 'create account' command to create an account or 'login' to be \n" + 
     "redirected to the login screen\n")
-  
+

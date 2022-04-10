@@ -21,6 +21,8 @@ access the database. Returns True if the account is successfully created. Otherw
 '''
 def create_account(cursor):
 
+  print("==========\nAccount Creation\n==========\n")
+
   cred = get_credentials()
   valid = "northeastern.edu" in cred[2] and len(cred[0]) > 0 and len(cred[1]) > 0 and len(cred[3]) > 0
 
@@ -41,6 +43,8 @@ Calls the 'login' stored function to count the number of users that match the
 user-input email and password. Returns this number.
 '''
 def login(cursor):
+
+  print("==========\nLogin\n==========\n")
 
   email = input("Email: ")
   pwd = input("Password: ")

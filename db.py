@@ -9,4 +9,4 @@ def db_connect():
   except pymysql.Error as e:
     print("Connection failed, Error: %d: %s" % (e.args[0], e.args[1]))
     exit()
-
+    
