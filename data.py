@@ -10,7 +10,7 @@ def make_data_bar(measure, value):
 
   class ReviewBar(ChargingBar):
     
-    suffix = str(value) + " " + course
+    suffix = str(value) + " "
   
   print(measure)
   
