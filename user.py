@@ -1,19 +1,4 @@
 '''
-None -> (String, String, String, String)
-
-Gets the login information of a user and returns it as a tuple.
-'''
-def get_credentials():
-
-  first = input("First Name: ")
-  last = input("Last Name: ")
-  email = input("Email: ")
-  pwd = input("Password: ")
-
-  return first, last, email, pwd
-
-
-'''
 DictCursor -> bool
 
 Calls the 'create user' stored procedure in ncr database to insert a user. Needs a cursor object to
@@ -23,16 +8,22 @@ def create_account(cursor):
 
   print("==========\nAccount Creation\n==========\n")
 
-  cred = get_credentials()
-  valid = "northeastern.edu" in cred[2] and len(cred[0]) > 0 and len(cred[1]) > 0 and len(cred[3]) > 0
+  first = input("First Name: ")
+  last = input("Last Name: ")
+  email = input("Email: ")
+  pwd = input("Password: ")
+
+  valid = "northeastern.edu" in email and len(first) > 0 and len(last) > 0 and len(pwd) > 0
 
   if valid:
     try:
-      cursor.callproc("create_user", cred)
+      cursor.callproc("create_user", (email, first, last, pwd))
+      print("Successfully created account!")
     except Exception as e:
       valid = False
       print(e)
-
+  else:
+    print("There is something wrong with your login credentials. Make sure your email is a northeastern address. Also make sure that none of your fields are empty.")
   return valid
 
 
@@ -51,9 +42,28 @@ def login(cursor):
   num_rows = 0
 
   try:
-    num_rows = cursor.callproc("login", (email, pwd))
+    cursor.callproc("login", (email, pwd))
+    num_rows = (cursor.fetchall()[0])['num_rows']
   except Exception as e:
-    print(e + "\n")
+    print(e)
     print("Something went wrong trying to log you in...")
   
-  return num_rows
+  if not num_rows:
+    print("\nEmail or password incorrect.\n")
+
+  return num_rows, email
+
+import db
+if __name__ == "__main__":
+  cnx = db.db_connect()
+  cursor = cnx.cursor()
+
+  login(cursor)
+  num_rows = cursor.fetchall()
+  print(num_rows)
+  num_rows = (num_rows[0])['num_rows']
+  print(num_rows)
+  cursor.close()
+
+# haines.e@northeastern.edu
+# password
