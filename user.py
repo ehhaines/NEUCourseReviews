@@ -24,7 +24,7 @@ def create_account(cursor):
       print(e)
   else:
     print("There is something wrong with your login credentials. Make sure your email is a northeastern address. Also make sure that none of your fields are empty.")
-  return valid
+  return valid, email
 
 
 '''

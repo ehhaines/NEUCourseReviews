@@ -2,6 +2,7 @@ import os
 import db
 import user
 import help
+import filter
 
 logo = '''
    _  ________  __              
@@ -16,11 +17,7 @@ logo = '''
 /_/|_|\__/|___/_/\__/|__,__/___/'''
 
 
-
-def main():
-  
-  cnx = db.db_connect()
-  cursor = cnx.cursor()
+def auth(cursor):
 
   print(logo + "\n\n")
   print("Welcome to NEU Course Reviews! Based on Northeastern's TRACE Evaluations, NEU Course Reviews is \na course evalution system " +
@@ -33,9 +30,11 @@ def main():
   while (login_success == 0):
     login = input(">> ")
     login = login.lower()
+    os.system('cls' if os.name == 'nt' else 'clear')
     if login == "create account":
-      os.system('cls' if os.name == 'nt' else 'clear')
-      login_success = user.create_account(cursor)
+      attempt = user.create_account(cursor)
+      login_success = attempt[0]
+      account = attempt[1]
     elif login == "login":
       attempt = user.login(cursor)
       login_success = attempt[0]
@@ -45,10 +44,62 @@ def main():
       help.login_help()
     elif login == "exit":
       print("\nGoodbye!\n")
+      cursor.close()
       exit()
     else:
       print("Error: invalid command. Use 'create account' command to create an account or 'login' to be \n" + 
       "redirected to the login screen\n")
+  
+  return account
+
+# search by professor, class name, subject code + coursecode
+
+def home(user, cursor):
+  os.system('cls' if os.name == 'nt' else 'clear')
+  cursor.callproc("find_user", (user,))
+  name = (cursor.fetchall()[0])["firstName"]
+  print("Welcome, " + name + "!\n")
+
+def find_course(cursor):
+  while(1):
+    print("You can search for courses by 'professor', 'subject', 'course code', or 'course name'.")
+    print("How would you like to search? (type one of the above commands in the prompt)\n\n")
+    method = input(">> ")
+    os.system('cls' if os.name == 'nt' else 'clear')
+    if method == "help":
+      help.home_help()
+    elif method == "exit":
+      print("\nGoodbye!\n")
+      cursor.close()
+      exit()
+    elif method == "professor":
+      print("Home > By Professor\n\n")
+      filter.by_professor(cursor)
+    elif method == "subject":
+      pass
+    elif method == "course code":
+      pass
+    elif method == "course name":
+      pass
+    elif method == "add":
+      pass
+    else:
+      print("Error: Invalid command entered. Please enter 'help' if you need assistance.")
+
+
+def main():
+  cnx = db.db_connect()
+  cursor = cnx.cursor()
+
+  #user = auth(cursor)
+
+  home("haines.e@northeastern.edu", cursor)
+
+  find_course(cursor)
+
+  # I close the database when 'exit' is input...this is just for good measure
+  cursor.close()
+
 
 
 if __name__ == "__main__":
