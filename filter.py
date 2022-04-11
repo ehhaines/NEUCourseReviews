@@ -44,6 +44,43 @@ def get_reviews(cursor, section):
 def by_course_code(cursor):
   print("Enter the code or partial code of the course you wish to view...\n")
   code = input(">> ")
+  print("\n")
+  cursor.callproc("filter_by_code", (code,))
+  all_courses = cursor.fetchall()
+
+  count = 0
+  for i in all_courses:
+    print(str(count) + "  " + i["code"] + " - " + i["courseName"])
+    count += 1
+  
+  selected_course = int(input("\n\nChoose a course using the number on the left: "))
+  this_code = (all_courses[selected_course])["code"]
+  subjectCode = (all_courses[selected_course])["subjectCode"]
+  courseCode = (all_courses[selected_course])["courseCode"]
+
+  os.system('cls' if os.name == 'nt' else 'clear')
+  print("Home > By Code > " + this_code + "\n\n")
+
+  statement = "SELECT * FROM section WHERE subjectCode = '%s' AND courseCode = %d ORDER BY year" % (subjectCode, courseCode)
+  cursor.execute(statement)
+
+  all_sections = cursor.fetchall()
+  count = 0
+  profs = []
+  terms = []
+  for i in all_sections:
+    cursor.execute("SELECT CONCAT(firstName, ' ', lastName) AS name FROM professor WHERE email = '%s'" % (i["professor"]))
+    prof = (cursor.fetchall()[0])["name"]
+    profs.append(prof)
+    terms.append(str(i["semester"]) + " " + str(i["year"]))
+    print(str(count) + "\t" + prof + "\t" + str(i["semester"]) + " " + str(i["year"]))
+    count += 1
+
+  this_section = int(input("\n\nSelect a section by the index: "))
+  os.system('cls' if os.name == 'nt' else 'clear')
+  print("Home > By Code > " + this_code + " > " + profs[this_section] + " " + terms[this_section] + "\n\n")
+  get_reviews(cursor, this_section)
+
 
 
 def by_professor(cursor):

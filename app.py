@@ -72,13 +72,14 @@ def find_course(cursor):
       print("\nGoodbye!\n")
       cursor.close()
       exit()
-    elif method == "professor":
+    elif method == "professor" or method == "prof":
       print("Home > By Professor\n\n")
       filter.by_professor(cursor)
     elif method == "subject":
       pass
-    elif method == "course code":
-      pass
+    elif method == "course code" or method == "cc":
+      print("Home > By Code\n\n")
+      filter.by_course_code(cursor)
     elif method == "course name":
       pass
     elif method == "add":
