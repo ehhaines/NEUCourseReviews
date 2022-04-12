@@ -75,12 +75,15 @@ def find_course(cursor):
     elif method == "professor" or method == "prof":
       print("Home > By Professor\n\n")
       filter.by_professor(cursor)
-    elif method == "subject":
-      pass
+    elif method == "subject" or method == "sub":
+      print("Home > By Subject\n\n")
+      filter.by_subject(cursor)
     elif method == "course code" or method == "cc":
       print("Home > By Code\n\n")
       filter.by_course_code(cursor)
-    elif method == "course name":
+    elif method == "course name" or method == "cn":
+      print("Home > By Course\n\n")
+      filter.by_course_name(cursor)
       pass
     elif method == "add":
       pass
