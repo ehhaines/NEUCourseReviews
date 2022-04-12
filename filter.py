@@ -1,5 +1,6 @@
 import os
 import data
+import summary
 
 def get_reviews(cursor, section):
   statement = "SELECT * FROM review WHERE section = %d" % (section)
@@ -11,39 +12,44 @@ def get_reviews(cursor, section):
     print(str(count) + "  " + str(i["reviewID"]))
     count += 1
 
-  selected = int(input("\n\nSelect a review using the numbers of the left: "))
-  reviewID = (all_reviews[selected])["reviewID"]
+  selected = input("\n\nSelect a review using the numbers of the left: ")
+  if selected.lower() == "summary" or selected.lower() == "sum":
+    print("\n==========\nSUMMARY\n==========\n\n")
+    summary.summarize(cursor, section)
+  else:
+    selected = int(selected)
+    reviewID = (all_reviews[selected])["reviewID"]
 
-  statement2 = "SELECT * FROM review WHERE reviewID = %d" % (reviewID)
-  cursor.execute(statement2)
+    statement2 = "SELECT * FROM review WHERE reviewID = %d" % (reviewID)
+    cursor.execute(statement2)
 
-  this_review = cursor.fetchall()
+    this_review = cursor.fetchall()
 
-  grade_received  = (this_review[0])["gradeReceived"]
-  time_spent = (this_review[0])["timeSpentOnClass"]
-  difficulty = (this_review[0])["courseDifficulty"]
-  course_quality = (this_review[0])["courseQuality"]
-  professor_quality = (this_review[0])["professorQuality"]
-  comments = (this_review[0])["comments"]
+    grade_received  = (this_review[0])["gradeReceived"]
+    time_spent = (this_review[0])["timeSpentOnClass"]
+    difficulty = (this_review[0])["courseDifficulty"]
+    course_quality = (this_review[0])["courseQuality"]
+    professor_quality = (this_review[0])["professorQuality"]
+    comments = (this_review[0])["comments"]
 
-  os.system('cls' if os.name == 'nt' else 'clear')
-  print("\n\n====================\nREVIEW\n====================\n\n")
-  print("Grade Received:\n" + str(grade_received) + "\n")
-  print("Weekly hours spent on class: \n" + str(time_spent) + "\n")
-  print("Course difficulty (0 = Very easy...10 = Very Difficult)")
-  data.make_data_bar("", difficulty)
-  print("\nCourse quality (0 = Poor...10 = Excellent)")
-  data.make_data_bar("", course_quality)
-  print("\nProfessor quality (0 = Poor...10 = Excellent)")
-  data.make_data_bar("", professor_quality)
-  print("\nComments:\n" + comments)
+    os.system('cls' if os.name == 'nt' else 'clear')
+    print("\n\n====================\nREVIEW\n====================\n\n")
+    print("Grade Received:\n" + str(grade_received) + "\n")
+    print("Weekly hours spent on class: \n" + str(time_spent) + "\n")
+    print("Course difficulty (0 = Very easy...10 = Very Difficult)")
+    data.make_data_bar("", difficulty)
+    print("\nCourse quality (0 = Poor...10 = Excellent)")
+    data.make_data_bar("", course_quality)
+    print("\nProfessor quality (0 = Poor...10 = Excellent)")
+    data.make_data_bar("", professor_quality)
+    print("\nComments:\n" + comments)
 
-  print("\n\nYou may need to scroll up to see complete review.\nPress 'Enter' key to begin new search.\nUse command 'exit' to terminate program.")
-  user_input = input(">> ")
-  if user_input.lower() == "exit":
-    cursor.close()
-    print("Goodbye!")
-    exit()
+    print("\n\nYou may need to scroll up to see complete review.\nPress 'Enter' key to begin new search.\nUse command 'exit' to terminate program.")
+    user_input = input(">> ")
+    if user_input.lower() == "exit":
+      cursor.close()
+      print("Goodbye!")
+      exit()
 
 
 def by_course_name(cursor):
