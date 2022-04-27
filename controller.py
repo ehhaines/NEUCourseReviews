@@ -1,3 +1,4 @@
+from pydoc import allmethods
 import pymysql
 import models.person as mp
 import os
@@ -132,17 +133,66 @@ class Session():
         os.system('cls' if os.name == 'nt' else 'clear')
     
     return user
+  
+
+  def choose_professor(self, professors):
+    count = len(professors) - 1
+    choice = input("\nChoose the index of the professor you wish to search: ")
+    if not choice.isdigit():
+      print("\nERROR: Input must be a positive digit")
+      input("Press 'Enter' to continue")
+      return
+    choice = int(choice)
+    if choice > count:
+      print("\nError: Value exceeds input range")
+      input("Press 'Enter' to continue")
+      return
+
+  def get_professors(self):
+    professor = input("\nEnter the full or partial name of a professor: ")
+    if professor.lower() == "abort" or professor.lower() == "a":
+      return
+    try:
+      self.cursor.callproc("get_matching_professors", (professor,))
+      all_matching = self.cursor.fetchall()
+      if len(all_matching) == 0:
+        print("\n\nThere are no professors that match your search. Consider adding one.")
+        input("\nPress 'Enter' to continue")
+        return
+      count = 0
+      print("\n")
+      for i in all_matching:
+        print(str(count) + ": " + "\t" + i["name"])
+        count = count + 1
+      self.choose_professor(all_matching)
+    except Exception as e:
+      print(e)
+      return
         
   def display_main(self, user):
-    os.system('cls' if os.name == 'nt' else 'clear')
     while(1):
-      print("Home\n\n")
+      os.system('cls' if os.name == 'nt' else 'clear')
+      print("Welcome, %s!\n\n" % user.get_name())
       print("""
       You can search for courses by professor, subject name, course name, or course code.\n
-      How would you like to search?\n\n
+      How would you like to search?
       """)
       command = input(">> ")
-      
+      command = command.lower()
+      if command == "professor" or command == "prof" or command == "p":
+        self.get_professors()
+      elif command == "subject name" or command == "subject" or command == "sub" or command == "s":
+        pass
+      elif command == "course name" or command == "cn":
+        pass
+      elif command == "course code" or command == "cc":
+        pass
+      elif command == "account" or command == "a":
+        pass
+      elif command == "quit" or command == "exit" or command == "q":
+        self.exit()
+      else:
+        pass
 
 
 
