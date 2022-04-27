@@ -4,6 +4,19 @@ class Review():
     self.cursor = cursor
     self.reviewID = reviewID
 
+  def get_review_id(self):
+    return self.reviewID
+  
+  def get_date_posted(self):
+    statement = "SELECT datePosted FROM review WHERE reviewID = %d ORDER BY datePosted DESC" % (self.reviewID)
+    try:
+      self.cursor.execute(statement)
+      date = (self.cursor.fetchall()[0])["datePosted"]
+      date_str = str(date.year) + "-" + str(date.month) + "-" + str(date.day)
+      return date_str
+    except Exception as e:
+      print(e)
+
   def view_review_data(self):
     try:
       self.cursor.callproc("get_review_data", (self.reviewID,))

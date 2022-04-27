@@ -1,6 +1,7 @@
-from pydoc import allmethods
 import pymysql
 import models.person as mp
+import models.section as ms
+import models.review as rev
 import os
 from progress.bar import ChargingBar
 
@@ -134,10 +135,42 @@ class Session():
     
     return user
   
+  def get_section_reviews(self, section):
+    all_reviews = section.get_section_reviews()
+    print("\nID\tDate Posted\n")
+    review_ids = []
+    for review in all_reviews:
+      this_review = rev.Review(self.cursor, review["reviewID"])
+      review_ids.append(this_review.get_review_id())
+      print(str(this_review.get_review_id()) + "\t" + str(this_review.get_date_posted()))
+    choice = input("\nSelect a review by its ID: ")
+    if not choice.isdigit() or int(choice) not in review_ids:
+      print("\nERROR: Illegal value input")
+      input("Press 'Enter' to continue")
+      return
+
+  
+  def get_professor_sections(self, professor):
+    sections = professor.get_sections_taught()
+    section_id = []
+    print("\nID\tSection\n")
+    for section in sections:
+      this_section = ms.Section(self.cursor, section["sectionID"])
+      print(str(this_section.get_sectionID()) + ":\t" + this_section.get_course() + " - " + this_section.get_section_term())
+      section_id.append(this_section.get_sectionID())
+    choice = input("\nChoose a section by inputting its section ID: ")
+    if not choice.isdigit() or int(choice) not in section_id:
+      print("\nERROR: Illegal value input")
+      input("Press 'Enter' to conitnue")
+      return
+    out_section_id = int(choice)
+    out_section = ms.Section(self.cursor, out_section_id)
+    self.get_section_reviews(out_section)
+    
 
   def choose_professor(self, professors):
     count = len(professors) - 1
-    choice = input("\nChoose the index of the professor you wish to search: ")
+    choice = input("\nSelect the index of the professor you wish to search: ")
     if not choice.isdigit():
       print("\nERROR: Input must be a positive digit")
       input("Press 'Enter' to continue")
@@ -147,6 +180,9 @@ class Session():
       print("\nError: Value exceeds input range")
       input("Press 'Enter' to continue")
       return
+    professor = professors[choice]
+    professor = mp.Professor(self.cursor, professor["email"])
+    self.get_professor_sections(professor)
 
   def get_professors(self):
     professor = input("\nEnter the full or partial name of a professor: ")
