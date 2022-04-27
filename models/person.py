@@ -163,5 +163,5 @@ if __name__ == "__main__":
   print("\n==========\nSuccessfully connected to the database.\n==========\n")
   cursor = cnx.cursor()
 
-  student = Student(cursor, "test@test.com", "password")
-  print([i["reviewID"] for i in student.get_reviews()])
+  student = Student(cursor, "test@b.com", "password")
+  print(student.login())
