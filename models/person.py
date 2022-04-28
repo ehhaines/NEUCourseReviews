@@ -118,13 +118,8 @@ class Student(Person):
     return exists
 
   def report(self, review, comments):
-    exists = 0
-    try:
-      self.cursor.callproc("add_report", (self.email, review, comments,))
-      exists = (self.cursor.fetchall()[0])["exist"]
-    except:
-      exists = 1
-      pass
+    self.cursor.callproc("add_report", (self.email, review, comments,))
+    exists = (self.cursor.fetchall()[0])["exist"]
     return exists
 
   def delete_review(self, review):

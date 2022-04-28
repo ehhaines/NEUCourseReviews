@@ -17,7 +17,15 @@ class Review():
     except Exception as e:
       print(e)
 
-  def view_review_data(self):
+  def get_section_reviewed(self):
+    try:
+      self.cursor.callproc("get_section_reviewed", (self.reviewID,))
+      section_str = (self.cursor.fetchall()[0])["title"]
+      return section_str
+    except Exception as e:
+      print(e)
+
+  def get_review_data(self):
     try:
       self.cursor.callproc("get_review_data", (self.reviewID,))
       review_data = self.cursor.fetchall()
