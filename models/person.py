@@ -63,8 +63,9 @@ class Student(Person):
       try:
         self.cursor.callproc("change_password", (self.email, new,))
         success = 1
-      except:
-        pass
+      except Exception as e:
+        print(e)
+        print("\n")
     return success
 
   def get_reviews(self):
@@ -127,31 +128,29 @@ class Student(Person):
     return exists
 
   def delete_review(self, review):
-    user_reviews = [i["reviewID"] for i in student.get_reviews()]
-    if review in user_reviews:
-      try:
-        self.cursor.callproc("delete_review", (review,))
-      except:
-        pass
+    try:
+      self.cursor.callproc("delete_review", (review,))
+      print("\nSucessfully deleted review!\n\n")
+    except Exception as e:
+      print(e)
   
   def update_review(self, review, grade, is_major, time, difficulty, course_qual, prof_qual, comments):
-    user_reviews = [i["reviewID"] for i in student.get_reviews()]
-    if review in user_reviews:
-      statement = "SELECT * FROM review WHERE reviewID = %d" % (review)
-      self.cursor.execute(statement)
-      fields = self.cursor.fetchall()[0]
-      var_grade = grade if grade else fields["gradeReceived"]
-      var_is_major = is_major if is_major else fields["isMajor"]
-      var_time = time if time else fields["timeSpentOnClass"]
-      var_diff = difficulty if difficulty else fields["courseDifficulty"]
-      var_course_qual = course_qual if course_qual else fields["courseQuality"]
-      var_prof_qual = prof_qual if prof_qual else fields["professorQuality"]
-      var_comments = comments if comments else fields["comments"]
-
-      try:
-        self.cursor.callproc("edit_review", (review, var_grade, var_is_major, var_time, var_diff, var_course_qual, var_prof_qual, var_comments))
-      except:
-        pass
+    statement = "SELECT * FROM review WHERE reviewID = %d" % (review)
+    self.cursor.execute(statement)
+    fields = self.cursor.fetchall()[0]
+    var_grade = grade if grade else fields["gradeReceived"]
+    var_is_major = is_major if is_major == 0 or is_major == 1 else fields["isMajor"]
+    var_time = time if time else fields["timeSpentOnClass"]
+    var_diff = difficulty if difficulty else fields["courseDifficulty"]
+    var_course_qual = course_qual if course_qual else fields["courseQuality"]
+    var_prof_qual = prof_qual if prof_qual else fields["professorQuality"]
+    var_comments = comments if comments else fields["comments"]
+    try:
+      self.cursor.callproc("edit_review", (review, var_grade, var_is_major, var_time, var_diff, var_course_qual, var_prof_qual, var_comments))
+      print("\nSuccessfully updated review!")
+    except Exception as e:
+      print(e)
+      print("\n")
 
 
 if __name__ == "__main__":

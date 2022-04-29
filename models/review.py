@@ -31,7 +31,8 @@ class Review():
       review_data = self.cursor.fetchall()
       return review_data
     except Exception as e:
-      return e
+      print(e)
+      print("\n")
   
   def retrieve_reports(self):
     try:

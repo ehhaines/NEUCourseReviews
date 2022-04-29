@@ -228,19 +228,19 @@ class Session():
       return
     time_spent = round(float(time_spent))
     diff = input("On a scale of 0 to 10, how difficult was this class (0 = Very Easy; 10 = Very Difficult)? ")
-    if not diff.isdecimal() or float(diff) < 0:
+    if not diff.isdecimal() or float(diff) < 0 or float(diff) > 10:
       print("\nDifficulty must be a positive integer.")
       input("Press 'Enter' to continue")
       return
     diff = round(float(diff))
     course_qual = input("On a scale of 0 to 10, how would you rate the quality of this course (0 = low quality; 10 = high quality)? ")
-    if not course_qual.isdecimal() or float(course_qual) < 0:
+    if not course_qual.isdecimal() or float(course_qual) < 0 or float(course_qual) > 10:
       print("\nCourse quality must be a positive integer.")
       input("Press 'Enter' to continue")
       return
     course_qual = round(float(course_qual))
     prof_qual = input("On a scale of 0 to 10, how would you rate the quality of this professor (0 = low quality; 10 = high quality)? ")
-    if not prof_qual.isdecimal() or float(prof_qual) < 0:
+    if not prof_qual.isdecimal() or float(prof_qual) < 0 or float(prof_qual) > 10:
       print("\nProfessor quality must be a positive integer.")
       input("Press 'Enter' to continue")
       return
@@ -577,11 +577,142 @@ class Session():
       self.choose_course(all_matching)
     except Exception as e:
       print(e)
-    
-  
-  def view_account(self):
-    pass
 
+  def change_password(self):
+    os.system('cls' if os.name == 'nt' else 'clear')
+    print("--------------------\nUpdate Password\n--------------------\n")
+    old_pass = input("Enter your old password: ")
+    if old_pass.lower() == "abort":
+      return
+    new_pass = input("Enter your new password: ")
+    if new_pass.lower() == "abort":
+      return
+    os.system('cls' if os.name == 'nt' else 'clear')
+    success = self.user.change_password(old_pass, new_pass)
+    if success:
+      print("Successfully changed password!\n\n")
+    else:
+      print("Password change failed.\n\n")
+    input("Press 'Enter' to continue")
+  
+  def delete_review(self, user_reviews, chosen_review):
+    if chosen_review not in user_reviews:
+      print("\nYou do not have access to review %s\n\n" % (chosen_review))
+    else:
+      self.user.delete_review(int(chosen_review))
+    input("Press 'Enter' to continue")
+
+  def update_review(self, user_reviews, chosen_review):
+    os.system('cls' if os.name == 'nt' else 'clear')
+    if chosen_review not in user_reviews:
+      print("\nYou do not have access to review %s\n\n" % (chosen_review))
+    else:
+      print("--------------------\nUpdate Review %s\n--------------------\n" % (chosen_review))
+      print("You will be shown your original answers to each prompt in the review.")
+      print("If you do not wish to modify your response to a prompt, simply leave it blank and press 'Enter'.")
+      print("If you wish to modify your response, write your new response in the space provided and then press 'Enter'.")
+      print("You will have the option to abort this process once all prompts are shown.\n\n")
+      this_review = rev.Review(self.cursor, int(chosen_review))
+      data = this_review.get_review_data()[0]
+      print("Grade Received: " + data["gradeReceived"])
+      grade = input(">> ")
+      grade = grade.upper()
+      if grade:
+        valid_grades = ["A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D+", "D", "D-", "F", "I", "W", "P", "C", "NA"]
+        if grade not in valid_grades:
+          print("\nIllegal response...terminating process. Valid grades are listed below:")
+          print(valid_grades)
+          input("\nPress 'Enter' to continue")
+          return
+      is_major = "Yes" if data["isMajor"] else "No"
+      print("\nDid you take this class to satisfy major/minor requirements? %s" % (is_major))
+      is_major_response = input(">> ")
+      if is_major_response:
+        if is_major_response.lower() == "yes" or is_major_response.lower() == "y":
+          is_major_response = 1
+        else:
+          is_major_response = 0
+      print(is_major_response)
+      print(data["isMajor"])
+      print("\nHow many hours did you spend on this class outside of class time? %d" % (data["timeSpentOnClass"]))
+      time_spent = input(">> ")
+      if time_spent:
+        if not time_spent.isdigit() or float(time_spent) < 0 or float(time_spent) > 10:
+          print("\nTime spent must be a positive integer.")
+          input("Press 'Enter' to continue")
+          return
+        time_spent = round(float(time_spent))
+      print("\nOn a scale from 0 to 10, how difficult was this course (0 = Very Easy; 10 = Very Difficult)? %d" % (data["courseDifficulty"]))
+      diff = input(">> ")
+      if diff:
+        if not diff.isdecimal() or float(diff) < 0 or float(diff) > 10:
+          print("\nDifficulty must be a positive integer.")
+          input("Press 'Enter' to continue")
+          return
+        diff = round(float(diff))
+      print("\nOn a scale of 0 to 10, how would you rate the quality of this course (0 = low quality; 10 = high quality)? %d" % (data["courseQuality"]))
+      course_qual = input(">> ")
+      if course_qual:
+        if not course_qual.isdecimal() or float(course_qual) < 0 or float(course_qual) > 10:
+          print("\nCourse quality must be a positive integer.")
+          input("Press 'Enter' to continue")
+          return
+        course_qual = round(float(course_qual))
+      print("\nOn a scale of 0 to 10, how would you rate the quality of this professor (0 = low quality; 10 = high quality)? %d" % (data["professorQuality"]))
+      prof_qual = input(">> ")
+      if prof_qual:
+        if not prof_qual.isdecimal() or float(prof_qual) < 0 or float(prof_qual) > 10:
+          print("\nProfessor quality must be a positive integer.")
+          input("Press 'Enter' to continue")
+          return
+        prof_qual = round(float(prof_qual))
+      print("\nAdditional Comments: ")
+      print(data["comments"])
+      comments = input("\n>> ")
+      os.system('cls' if os.name == 'nt' else 'clear')
+      self.user.update_review(int(chosen_review), grade, is_major_response, time_spent, diff, course_qual, prof_qual, comments)
+      input("\nPress 'Enter' to continue")
+
+
+  def view_account(self):
+    os.system('cls' if os.name == 'nt' else 'clear')
+    print("--------------------\nUser Account\n--------------------\n")
+
+    print("Here you can view your personal information. All your reviews are displayed as well.")
+    print("Use the 'update <reviewID>' command to update a review.")
+    print("Use the 'delete <reviewID>' command to delete a review.")
+    print("Use the 'change pwd' command to change your password.")
+    print("Press 'Enter' to return to the home screen.")
+
+    print("\n\nName: %s" % (self.user.get_name()))
+    print("Email: %s" % (self.user.get_email()))
+    print("\nYour Reviews:\n")
+    all_reviews = self.user.get_reviews()
+    print("ReviewID\tReview Info")
+    review_ids = []
+    for i in all_reviews:
+      id = str(i["reviewID"])
+      review_ids.append(id)
+      print(id + "\t\t" + i["course"] + " - " + i["term"] + " - " + i["prof"])
+    command = input("\n\n>> ")
+    if command.lower() == "change pwd":
+      self.change_password()
+      return
+    command = command.split()
+    if not len(command):
+      return
+    elif command[0].lower() == "delete":
+      if len(command) == 2:
+        chosen_rev = command[1]
+        self.delete_review(review_ids, chosen_rev)
+        return
+    elif command[0].lower() == "update":
+      if len(command) == 2:
+        chosen_rev = command[1]
+        self.update_review(review_ids, chosen_rev)
+        return
+    
+   
   def display_main(self, user):
     while(1):
       os.system('cls' if os.name == 'nt' else 'clear')
