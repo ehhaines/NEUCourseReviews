@@ -673,6 +673,47 @@ class Session():
       self.user.update_review(int(chosen_review), grade, is_major_response, time_spent, diff, course_qual, prof_qual, comments)
       input("\nPress 'Enter' to continue")
 
+  def change_name(self):
+    os.system('cls' if os.name == 'nt' else 'clear')
+    first = input("First Name: ")
+    if len(first.split()) == 0:
+      print("\nFirst name must not be null.")
+      input("Press 'Enter' to continue")
+      return
+    last = input("Last Name: ")
+    if len(last.split()) == 0:
+      print("\nLast name must not be null.")
+      input("Press 'Enter' to continue")
+      return
+    decision = input("\nAre you sure you would like to change your name? Use command 'abort' to terminate. Otherwise press 'Enter'.")
+    if decision.lower() == "abort":
+      return
+    os.system('cls' if os.name == 'nt' else 'clear')
+    success = self.user.change_name(first, last)
+    if success:
+      print("Your name has been updated!\n")
+    else:
+      print("Failed to change name.\n")
+    input("Press 'Enter' to continue")
+  
+  def change_email(self):
+    os.system('cls' if os.name == 'nt' else 'clear')
+    new_email = input("Enter you updated email address: ")
+    if "@northeastern.edu" not in new_email:
+      print("\nYour email must contain '@northeastern.edu'.")
+      input("Press 'Enter' to continue")
+      return
+    decision = input("\nAre you sure you would like to change your name? Use command 'abort' to terminate. Otherwise press 'Enter'.")
+    if decision.lower() == "abort":
+      return
+    os.system('cls' if os.name == 'nt' else 'clear')
+    success = self.user.change_email(new_email)
+    if success:
+      print("Your email has been changed!\n")
+    else:
+      print("An error occurred while updating your email address.\n")
+    input("Press 'Enter' to continue")
+
 
   def view_account(self):
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -681,7 +722,7 @@ class Session():
     print("Here you can view your personal information. All your reviews are displayed as well.")
     print("Use the 'update <reviewID>' command to update a review.")
     print("Use the 'delete <reviewID>' command to delete a review.")
-    print("Use the 'change pwd' command to change your password.")
+    print("Use the 'change pwd' command to change your password, 'change name' to change your name,\nand 'change email' to update your email.")
     print("Press 'Enter' to return to the home screen.")
 
     print("\n\nName: %s" % (self.user.get_name()))
@@ -697,6 +738,12 @@ class Session():
     command = input("\n\n>> ")
     if command.lower() == "change pwd":
       self.change_password()
+      return
+    elif command.lower() == "change name":
+      self.change_name()
+      return
+    elif command.lower() == "change email":
+      self.change_email()
       return
     command = command.split()
     if not len(command):
@@ -716,10 +763,12 @@ class Session():
   def display_main(self, user):
     while(1):
       os.system('cls' if os.name == 'nt' else 'clear')
-      print("Welcome, %s!\n\n" % user.get_name())
+      print("Welcome, %s!\n" % user.get_name())
       print("""
-      You can search for courses by professor, subject name, course name, or course code.\n
-      How would you like to search?
+      You can search for courses using the 'professor', 'subject name', 'course name', and 'course code' commands.
+      You can also use the 'account' command to view and update your account information.
+      Use the 'help' command if you need assistant, and 'exit' or 'quit' to logout.\n
+      Enter a command below to begin!
       """)
       command = input(">> ")
       command = command.lower()
