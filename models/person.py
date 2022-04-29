@@ -67,6 +67,29 @@ class Student(Person):
         print(e)
         print("\n")
     return success
+  
+  def change_name(self, first, last):
+    success = 0
+    try:
+      self.cursor.callproc("change_name", (self.email, first, last,))
+      success = 1
+    except Exception as e:
+      print(e)
+      print("\n")
+      success = 0
+    return success
+
+  def change_email(self, new_email):
+    success = 0
+    try:
+      self.cursor.callproc("change_email", (self.email, new_email,))
+      success = 1
+      self.email = new_email
+    except Exception as e:
+      print(e)
+      print("\n")
+      success = 0
+    return success
 
   def get_reviews(self):
     try:
