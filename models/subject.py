@@ -8,7 +8,7 @@ class Subject():
     return self.code
   
   def get_subject_name(self):
-    statement = "SELECT subjectName FROM subject WHERE subjectCode = %d" % (self.code)
+    statement = "SELECT subjectName FROM subject WHERE subjectCode = '%s'" % (self.code)
     try:
       self.cursor.execute(statement)
       subject_name = (self.cursor.fetchall()[0])["subjectName"]

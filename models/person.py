@@ -80,9 +80,10 @@ class Student(Person):
     try:
       self.cursor.callproc("add_professor", (prof_first, prof_last, prof_email))
       exists = (self.cursor.fetchall()[0])["exist"]
-    except:
+    except Exception as e:
       exists = 1
-      pass
+      print(e)
+      print("\n")
     return exists
   
   def add_course(self, subjectCode, courseCode, courseName):
@@ -90,19 +91,21 @@ class Student(Person):
     try:
       self.cursor.callproc("add_course", (subjectCode, courseCode, courseName,))
       exists = (self.cursor.fetchall()[0])["exist"]
-    except:
+    except Exception as e:
+      print(e)
+      print("\n")
       exists = 1
-      pass
     return exists
   
   def add_section(self, subjectCode, courseCode, professor, year, semester):
     exists = 0
     try:
-      self.cursor.callproc("add_course", (subjectCode, courseCode, courseCode, professor, year, semester,))
+      self.cursor.callproc("add_section", (subjectCode, courseCode, professor, year, semester,))
       exists = (self.cursor.fetchall()[0])["exist"]
-    except:
+    except Exception as e:
       exists = 1
-      pass
+      print(e)
+      print("\n")
     return exists
   
   def add_review(self, grade_received, is_major, time_spent, diff, course_qual, prof_qual, comments, section):
@@ -110,11 +113,12 @@ class Student(Person):
     poster = self.email
     exists = 0
     try:
-      self.cursor.callproc("add_review", (poster, today, grade_received, is_major, time_spent, diff, course_qual, prof_qual, comments, section))
+      self.cursor.callproc("add_review", (poster, today, grade_received, is_major, time_spent, diff, course_qual, prof_qual, comments, section,))
       exists = (self.cursor.fetchall()[0])["exist"]
-    except:
+    except Exception as e:
       exists = 1
-      pass
+      print(e)
+      print("\n\n")
     return exists
 
   def report(self, review, comments):
