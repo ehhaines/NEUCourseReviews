@@ -1,3 +1,6 @@
 # NEUCourseReviews
 
-Import the progress bar package using pip3 install progress.
+Import the progress bar package using 
+```ruby 
+pip3 install progress
+```
