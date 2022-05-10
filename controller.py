@@ -164,7 +164,7 @@ class Session():
       print("\n\nWelcome to NEU Course Reviews! Based on Northeastern's TRACE Evaluations, NEU Course Reviews is \na course evalution system " +
       "made with students in mind. If you are new here, you can create an \naccount using the 'create account' command. Otherwise, " +
       "use the 'login' command to redirect to the \nlogin screen.\n")
-      print("(You can always use the 'help' command if you are unsure of how to proceed)\n")
+      print("(You can always use the 'help' command if you are unsure of how to proceed. Use 'exit' to exit.)\n")
 
       command = input(">> ").lower()
       if command == "login":
@@ -174,6 +174,7 @@ class Session():
       elif command == "help":
         self.home_help()
       elif command == "exit" or command == "quit" or command == "q":
+        self.cursor.close()
         self.exit()
       else:
         print("ERROR: Invalid command entered\n\n")
@@ -347,7 +348,7 @@ class Session():
       this_review = rev.Review(self.cursor, review["reviewID"])
       review_ids.append(this_review.get_review_id())
       print(str(this_review.get_review_id()) + "\t" + str(this_review.get_date_posted()))
-    choice = input("\nSelect a review by its ID: ")
+    choice = input("\nSelect a review by its ID or add review using 'add': ")
     if choice.lower() == "add":
       self.add_review(section.get_sectionID())
       return
@@ -421,7 +422,7 @@ class Session():
       this_section = ms.Section(self.cursor, section["sectionID"])
       print(str(this_section.get_sectionID()) + ":\t" + this_section.get_course() + " - " + this_section.get_section_term())
       section_id.append(this_section.get_sectionID())
-    choice = input("\nChoose a section by inputting its section ID: ")
+    choice = input("\nChoose a section by inputting its section ID or add section using 'add': ")
 
     if choice.lower() == "add":
       self.add_section(professor=professor.get_email())
@@ -434,27 +435,6 @@ class Session():
     out_section = ms.Section(self.cursor, out_section_id)
     self.get_section_reviews(out_section)
     
-
-  def choose_professor(self, professors):
-    '''Selects a professor to get sections from. Returns None.
-    
-    Arguments:
-    professors - a list of professors to choose from
-    '''
-    count = len(professors) - 1
-    choice = input("\nSelect the index of the professor you wish to search: ")
-    if not choice.isdigit():
-      print("\nERROR: Input must be a positive digit")
-      input("Press 'Enter' to continue")
-      return
-    choice = int(choice)
-    if choice > count:
-      print("\nError: Value exceeds input range")
-      input("Press 'Enter' to continue")
-      return
-    professor = professors[choice]
-    professor = mp.Professor(self.cursor, professor["email"])
-    self.get_professor_sections(professor)
 
 
   def add_professor(self):
@@ -488,6 +468,31 @@ class Session():
     else:
       print("A error occurred while adding this professor to the database.\n")
     input("Press 'Enter' to continue")
+  
+
+  def choose_professor(self, professors):
+    '''Selects a professor to get sections from. Returns None.
+    
+    Arguments:
+    professors - a list of professors to choose from
+    '''
+    count = len(professors) - 1
+    choice = input("\nSelect the index of the professor you wish to search or add professor using 'add': ")
+    if choice.lower() == "add":
+      self.add_professor()
+      return
+    if not choice.isdigit():
+      print("\nERROR: Input must be a positive digit")
+      input("Press 'Enter' to continue")
+      return
+    choice = int(choice)
+    if choice > count:
+      print("\nError: Value exceeds input range")
+      input("Press 'Enter' to continue")
+      return
+    professor = professors[choice]
+    professor = mp.Professor(self.cursor, professor["email"])
+    self.get_professor_sections(professor)
 
 
   def get_professors(self):
@@ -540,7 +545,10 @@ class Session():
       print(str(this_section.get_sectionID()) + ":\t" + this_section.get_course() + " - " + this_section.get_section_term() + " - " + this_section.get_section_professor())
       section_id.append(this_section.get_sectionID())
     
-    choice = input("\nChoose a section by inputting its section ID: ")
+    choice = input("\nChoose a section by inputting its section ID or add section using 'add': ")
+    if choice.lower() == "add":
+      self.add_section(subjectCode=subject.get_subject_code())
+      return
     if not choice.isdigit() or int(choice) not in section_id:
       print("\nERROR: Illegal value input")
       input("Press 'Enter' to conitnue")
@@ -609,7 +617,7 @@ class Session():
       this_section = ms.Section(self.cursor, section["sectionID"])
       print(str(this_section.get_sectionID()) + ":\t" + this_section.get_course() + " - " + this_section.get_section_term() + " - " + this_section.get_section_professor())
       section_id.append(this_section.get_sectionID())
-    choice = input("\nChoose a section by inputting its section ID: ")
+    choice = input("\nChoose a section by inputting its section ID or add section using 'add': ")
     if choice.lower() == "add":
       self.add_section(subjectCode=course.get_subject_code(), courseCode=course.get_course_code())
       return
@@ -621,29 +629,6 @@ class Session():
     out_section = ms.Section(self.cursor, out_section_id)
     self.get_section_reviews(out_section)
 
-  
-  def choose_course(self, courses):
-    '''Prompts user to choose a course from a list of courses. Returns None.
-    
-    Arguments:
-    courses -- list of courses
-    '''
-    print("Index\tCourse")
-    count = 0
-    for i in courses:     # Iterates through list of courses and prints them
-      print(str(count) + "\t" + i["name"])
-      count = count + 1
-
-    choice = input("\n\nSelect a course by entering its index value: ")   # User chooses course
-    if not choice.isdigit() or int(choice) > (count-1):
-      print("\n\nERROR: Illegal input value\n")
-      input("Press 'Enter' to continue.")
-      return
-
-    this_course_code = (courses[int(choice)])["courseCode"]
-    this_subject_code = (courses[int(choice)])["subjectCode"]
-    this_course = c.Course(self.cursor, this_subject_code, this_course_code)
-    self.get_course_sections(this_course)
   
   def add_course(self):
     '''Calls user method to add a course to the database. Takes no arguments,
@@ -674,6 +659,33 @@ class Session():
     else:
       print("A problem occured while adding your course to the database.\n\n")
     input("Press 'Enter' to continue")
+
+
+  def choose_course(self, courses):
+    '''Prompts user to choose a course from a list of courses. Returns None.
+    
+    Arguments:
+    courses -- list of courses
+    '''
+    print("Index\tCourse")
+    count = 0
+    for i in courses:     # Iterates through list of courses and prints them
+      print(str(count) + "\t" + i["name"])
+      count = count + 1
+
+    choice = input("\n\nSelect a course by entering its index value or add course using 'add': ")   # User chooses course
+    if choice.lower() == "add":
+      self.add_course()
+      return
+    if not choice.isdigit() or int(choice) > (count-1):
+      print("\n\nERROR: Illegal input value\n")
+      input("Press 'Enter' to continue.")
+      return
+
+    this_course_code = (courses[int(choice)])["courseCode"]
+    this_subject_code = (courses[int(choice)])["subjectCode"]
+    this_course = c.Course(self.cursor, this_subject_code, this_course_code)
+    self.get_course_sections(this_course)
 
 
   def start_course_name(self):
@@ -929,7 +941,21 @@ class Session():
         chosen_rev = command[1]
         self.update_review(review_ids, chosen_rev)
         return
-    
+  
+  def main_help(self):
+    os.system('cls' if os.name == 'nt' else 'clear')
+    help = """
+          'help' - Displays all commands for the relevant screen\n\n
+          'professor' - Begins process of searching for reviews by professor (shortcut: 'prof', 'p')\n\n
+          'subject name' - Begins process of searching for reviews by subject (shortcut: 'subject', 'sub', 's')\n\n
+          'course code' - Begins process of searching for reviews by course code (shortcut: 'cc')\n\n
+          'course name' - Begins process of searching for reviews by course name (shortcut: 'cn')\n\n
+          'account' - Brings user to their account page (shortcut: 'a')\n\n
+          'exit' - Terminates session (shortcut: 'quit', 'q')\n\n\n
+          """
+    print(help)
+    input("Press 'Enter' to continue")
+    os.system('cls' if os.name == 'nt' else 'clear')
    
   def display_main(self, user):
     '''Interface to interact with the search page. Takes no arguments, returns none'''
@@ -954,6 +980,8 @@ class Session():
         self.start_course_code()
       elif command == "account" or command == "a":
         self.view_account()
+      elif command == "help":
+        self.main_help()
       elif command == "quit" or command == "exit" or command == "q":
         self.cursor.close()
         self.exit()
