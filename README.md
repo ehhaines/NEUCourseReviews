@@ -1,3 +1,5 @@
+![Lines of code](https://img.shields.io/tokei/lines/github/vnhns/NEUCourseReviews) ![Twitter Follow](https://img.shields.io/twitter/follow/vn_hns?style=social) ![YouTube Video Views](https://img.shields.io/youtube/views/kF0w8zHGmjI?style=social)
+
 # NEUCourseReviews
 
 NEUCourseReviews is a course reviewal application for Northeastern students based on Northeastern's
@@ -42,3 +44,7 @@ A review will display the responses of the reviewer and are publicly available t
 ![Account](/images/account.png)
 
 A user can also access information about their own account using the 'account' command. Here, a user can update their email address or name as well as update or delete any of their own reviews.
+
+## Credits
+
+NEUCourseReviews was created as a final project for CS5200 - Database Management Systems. I would like to thank Professor Kathleen Durant for an amazing semester.
